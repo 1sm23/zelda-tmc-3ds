@@ -6,6 +6,15 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+    inputs:
+      region:
+        description: 3DS ROM family to build
+        required: false
+        default: USA
+        type: choice
+        options:
+          - USA
+          - JP
 
 permissions:
   contents: read
@@ -29,7 +38,9 @@ jobs:
             echo "::warning::devkitPro package sync is unavailable; continuing with the tools bundled in the container."
           fi
 
-      - name: Build universal CIA and 3DSX
+      - name: Build selected-region CIA and 3DSX
+        env:
+          TMC3DS_REGION: ${{ inputs.region || 'USA' }}
         run: ./platform/3ds/build.sh
 
       - name: Verify build outputs and legal files
